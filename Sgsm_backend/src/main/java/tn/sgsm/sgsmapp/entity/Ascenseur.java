@@ -38,7 +38,7 @@ public class Ascenseur {
 	
 	private String ref;
 	
-	
+	private String imageName;
 	
 	@JsonIgnore
 	@ManyToOne

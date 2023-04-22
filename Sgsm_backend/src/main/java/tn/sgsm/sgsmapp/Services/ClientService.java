@@ -3,6 +3,8 @@ package tn.sgsm.sgsmapp.Services;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -54,7 +56,7 @@ public class ClientService {
 		  
 		  return asc;
 	  }
-	  public MessageResponse ajoutAsc(Ascenseur asc, int id, MultipartFile file ) throws IOException {
+	  public MessageResponse ajoutAsc(Ascenseur asc, int id ) throws IOException {
 		   		
 		  Client client = userRepository.findById(id).get();
 			
@@ -93,7 +95,9 @@ public class ClientService {
 	
 	public List<Client> getAllUsers() {
 		
-		return userRepository.findAll();
+		List<Client> clients = userRepository.findAll().stream().filter(c -> c.getRole() == Role.Client ).
+				collect(Collectors.toList());
+		return clients;
 	}
 
 }

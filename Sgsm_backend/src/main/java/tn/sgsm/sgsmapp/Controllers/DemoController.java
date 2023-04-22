@@ -1,9 +1,15 @@
 package tn.sgsm.sgsmapp.Controllers;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,10 +42,6 @@ public class DemoController {
 	private final ClientService userService;
 	private final AscenseurService ascenseurService;
 
-	@GetMapping("/c")
-	public ResponseEntity<String> sayHello(){
-		return ResponseEntity.ok("Heelo");
-	}
 	
 	@GetMapping("/getrole/{id}")
 	public ResponseEntity<Role> getRole(@PathVariable int id){
@@ -65,7 +68,6 @@ public class DemoController {
 		return ResponseEntity.ok(userService.updateclient(client));
 	}
 	
-	//@PreAuthorize("hasAuthority('Client')")
 	  @GetMapping("/user")
 	  public Client getUserData() {
 	    
@@ -78,23 +80,32 @@ public class DemoController {
 		  return  ResponseEntity.ok(userService.getClientAsc(id));
 				  
 	  }
-	  
+	  static String path_dir = "C:\\Users\\yassi\\git\\sgsmbackends\\Sgsm_backend\\src\\main\\resources\\static\\images";
+
 	  @PostMapping(path = "/ajoutAsc/{id}" , consumes = { MediaType.MULTIPART_FORM_DATA_VALUE})
 	  public MessageResponse ajouterAsc(@RequestPart("ascenseur") Ascenseur asc ,
-			  @RequestPart("image") MultipartFile file ,
+			  @RequestParam("image") MultipartFile file ,
 			  @PathVariable int id
 			  
 			  ) {
 		  try {
-			 
-			  
-			  userService.ajoutAsc(asc,id,file);
+			  Files.copy(file.getInputStream(), Paths.get(path_dir+File.separator+file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+			  asc.setImageName("http://localhost:8081/api/v1/demo/image/"+file.getOriginalFilename());
+			  userService.ajoutAsc(asc,id);
 			  return new MessageResponse(true, "Done", "Ajout effectue avec success");
 		  } catch (Exception e) {
 			  System.out.println(e.getMessage());
 			  return new MessageResponse(false, "Undone", "Something happen");
 		  }
 
+	  }
+	  @GetMapping("/image/{fileName}")
+	  public ResponseEntity<Resource> getImage(@PathVariable String fileName) throws IOException {
+	      Resource resource = new FileSystemResource(path_dir +File.separator + fileName);
+	      return ResponseEntity.ok()
+	              .contentType(MediaType.IMAGE_JPEG)
+	              .contentLength(resource.contentLength())
+	              .body(resource);
 	  }
 	  
 	 
