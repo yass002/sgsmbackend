@@ -1,7 +1,14 @@
 package tn.sgsm.sgsmapp.entity;
 
 
+
+
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -20,9 +27,20 @@ import lombok.Setter;
 @Entity
 @Table(name="_ascenseur")
 public class Ascenseur {
-	@Id
-	public int id;
 	
+	
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private int id;
+	
+	private String marque;
+	
+	private String ref;
+	
+	
+	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name="idClient", nullable=false)
     private Client client;

@@ -47,12 +47,20 @@ public class Client implements UserDetails {
 	private String numFix;
 	private String adresse;
 	private String email;
+	
+	
 	@JsonIgnore
 	private String password;
 	
+	
+	
+	
+	
+	
 	@Builder.Default
-	 @OneToMany( targetEntity=Ascenseur.class, mappedBy="client" )
-	    private List<Ascenseur> asc = new ArrayList<>();
+	@JsonIgnore
+	@OneToMany( targetEntity=Ascenseur.class, mappedBy="client" )
+	private List<Ascenseur> asc = new ArrayList<>();
 	
 	@Enumerated(EnumType.STRING)
 	private  Role role;
@@ -63,26 +71,31 @@ public class Client implements UserDetails {
 		// TODO Auto-generated method stub
 		return List.of(new SimpleGrantedAuthority(role.name()));
 	}
+	@JsonIgnore
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
 		return email;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonExpired() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isAccountNonLocked() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isCredentialsNonExpired() {
 		// TODO Auto-generated method stub
 		return true;
 	}
+	@JsonIgnore
 	@Override
 	public boolean isEnabled() {
 		// TODO Auto-generated method stub
