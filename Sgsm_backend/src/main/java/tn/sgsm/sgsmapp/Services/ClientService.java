@@ -3,13 +3,12 @@ package tn.sgsm.sgsmapp.Services;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import tn.sgsm.sgsmapp.entity.Role;
@@ -33,12 +32,30 @@ public class ClientService {
 		return userRepository.findById(id).orElseThrow();
 		
 	}
-	
+	public MessageResponse ajouterClientAsc(Client cl, List<Ascenseur> asc) throws IOException {
+		//il faut mettre le mot de passe echangeable aprés ..
+		cl.setPassword(cl.getFirstName()+cl.getLastName()+"sgsm");
+		cl.setRole(Role.Client);
+		cl.setAsc(asc);
+		userRepository.save(cl);
+		asc.forEach(asce -> asce.setClient(cl) );
+		asc.forEach(asce -> ascenseurRepository.save(asce) );
+		
+		
+		return new MessageResponse(true, "Success", "ajout effectue");
+	}
 	  
 	  public Client getClientData() {
 	    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 	    String username = authentication.getName();
 	    return userRepository.findByEmail(username).orElseThrow();
+	  }
+	  
+	  public int getAuthUserId() {
+		  Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		  String username= authentication.getName();
+		  Client cl = userRepository.findByEmail(username).get();
+		  return cl.getId();
 	  }
 	  
 	  

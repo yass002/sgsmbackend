@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,7 @@ import tn.sgsm.sgsmapp.Services.ClientService;
 import tn.sgsm.sgsmapp.entity.Ascenseur;
 import tn.sgsm.sgsmapp.entity.Client;
 import tn.sgsm.sgsmapp.entity.Role;
+import tn.sgsm.sgsmapp.repo.UserRepository;
 import tn.sgsm.sgsmapp.response.MessageResponse;
 
 
@@ -41,8 +44,8 @@ public class DemoController {
 	
 	private final ClientService userService;
 	private final AscenseurService ascenseurService;
-
-	
+	private final UserRepository userRepository ;
+	private final BCryptPasswordEncoder encoder;
 	@GetMapping("/getrole/{id}")
 	public ResponseEntity<Role> getRole(@PathVariable int id){
 		return ResponseEntity.ok(userService.getRole(id));
@@ -108,6 +111,67 @@ public class DemoController {
 	              .body(resource);
 	  }
 	  
+	  
+		/*
+		 * @PostMapping(path = "/ajouterclient" , consumes = {
+		 * MediaType.MULTIPART_FORM_DATA_VALUE}) public MessageResponse
+		 * ajouterClient(@RequestPart("client") Client cl , @RequestPart("ascenseur")
+		 * List<Ascenseur> asc ,
+		 * 
+		 * @RequestParam("image") MultipartFile[] file
+		 * 
+		 * ) { try { for (MultipartFile f: file) { Files.copy(f.getInputStream(),
+		 * Paths.get(path_dir+File.separator+f.getOriginalFilename()),
+		 * StandardCopyOption.REPLACE_EXISTING); asc.forEach(a->
+		 * a.setImageName("http://localhost:8081/api/v1/demo/image/"+f.
+		 * getOriginalFilename())); } userService.ajouterClientAsc(cl, asc); return new
+		 * MessageResponse(true, "Done", "Ajout effectue avec success"); } catch
+		 * (Exception e) { System.out.println(e.getMessage()); return new
+		 * MessageResponse(false, "Undone", "Something happen"); }
+		 * 
+		 * }
+		 */
+	  
+	  @PostMapping("/ajouteclients")
+	  public ResponseEntity<Client> addClient(
+	          @RequestPart("client") Client client,
+	          @RequestPart("ascenseurs") Ascenseur[] ascenseurs,
+	          @RequestPart("image") MultipartFile[] files) throws IOException {
+
+	      if (ascenseurs.length != files.length) {
+	          throw new IllegalArgumentException("The ascenseurs and files arrays must have the same length");
+	      }
+	      if (client.getAsc() == null) {
+	          client.setAsc(new ArrayList<>());
+	      }
+
+	      // Add ascenseurs to client and save images to disk
+	      for (int i = 0; i < ascenseurs.length; i++) {
+	          Ascenseur asc = ascenseurs[i];
+	          MultipartFile file = files[i];
+	          asc.setImageName(file.getOriginalFilename());
+	          asc.setClient(client);
+	          client.getAsc().add(asc);
+
+	          // Save image to disk
+	       
+	          Files.copy(file.getInputStream(), Paths.get(path_dir+File.separator+file.getOriginalFilename()), StandardCopyOption.REPLACE_EXISTING);
+			  asc.setImageName("http://localhost:8081/api/v1/demo/image/"+file.getOriginalFilename());
+	      }
+
+	      // Save client to database
+	      client.setRole(Role.Client);
+	      client.setPassword( encoder.encode("sgsm_client") );
+	      Client savedClient = userRepository.save(client);
+
+	      return ResponseEntity.ok(savedClient);
+	  }
+	  
+	  @GetMapping("/getclientid")
+	  public int getAuthidClient() {
+		  return userService.getAuthUserId();
+	  }
+	 
 	 
 
 	

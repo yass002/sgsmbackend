@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -59,7 +60,7 @@ public class Client implements UserDetails {
 	
 	@Builder.Default
 	@JsonIgnore
-	@OneToMany( targetEntity=Ascenseur.class, mappedBy="client" )
+	@OneToMany( targetEntity=Ascenseur.class, mappedBy="client", cascade = CascadeType.ALL )
 	private List<Ascenseur> asc = new ArrayList<>();
 	
 	@Enumerated(EnumType.STRING)
