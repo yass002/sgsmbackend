@@ -42,7 +42,6 @@ public class Technicien implements UserDetails {
 	private String firstName;
 	private String lastName;
 	private String numTel;
-	private String numFix;
 	private String adresse;
 	private String email;
 	@JsonIgnore

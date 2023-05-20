@@ -7,6 +7,7 @@ package tn.sgsm.sgsmapp.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -51,6 +52,7 @@ public class Ascenseur {
     private Client client;
 	
 	@OneToMany ( targetEntity = Panne.class , mappedBy = "ascenseur" , cascade = CascadeType.ALL )
+	@JsonBackReference
 	private List<Panne> panne = new ArrayList<>();
 	
 }

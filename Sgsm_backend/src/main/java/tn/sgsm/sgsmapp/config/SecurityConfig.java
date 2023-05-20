@@ -12,6 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 import lombok.RequiredArgsConstructor;
+import tn.sgsm.sgsmapp.entity.Role;
 import tn.sgsm.sgsmapp.filters.JwtAuthenticationFilter;
 
 @Configuration
@@ -27,7 +28,7 @@ public class SecurityConfig {
 		
 		http.csrf().disable()
 			.authorizeHttpRequests()
-			.requestMatchers("/api/v1/**")
+			.requestMatchers("/api/**")
 			.permitAll()
 			.anyRequest()
 			.authenticated()

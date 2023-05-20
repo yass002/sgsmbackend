@@ -1,10 +1,9 @@
 package tn.sgsm.sgsmapp.entity;
 
 import java.util.Date;
-import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,7 +15,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -34,8 +32,8 @@ public class Panne {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	
-	
-	private Date datePanne ;
+	 @Column(name = "date_panne")
+	private Date date ;
 	
 	private String descPanne;
 	
@@ -44,6 +42,7 @@ public class Panne {
 	
 	@ManyToOne 
 	@JoinColumn(name = "ascenseurId" , nullable = false )
-	@JsonIgnore
 	private Ascenseur ascenseur;
+	
+
 }
